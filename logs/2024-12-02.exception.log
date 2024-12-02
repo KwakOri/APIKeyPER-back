@@ -1,0 +1,55 @@
+2024-12-02 20:24:17 [undefined] error: uncaughtException: database "kwakori" does not exist
+error: database "kwakori" does not exist
+    at Parser.parseErrorMessage (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:283:98)
+    at Parser.handlePacket (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:122:29)
+    at Parser.parse (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:35:38)
+    at Socket.<anonymous> (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/index.js:11:42)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+2024-12-02 20:24:48 [undefined] error: uncaughtException: database "kwakori" does not exist
+error: database "kwakori" does not exist
+    at Parser.parseErrorMessage (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:283:98)
+    at Parser.handlePacket (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:122:29)
+    at Parser.parse (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:35:38)
+    at Socket.<anonymous> (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/index.js:11:42)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+2024-12-02 20:27:28 [undefined] error: uncaughtException: database "kwakori" does not exist
+error: database "kwakori" does not exist
+    at Parser.parseErrorMessage (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:283:98)
+    at Parser.handlePacket (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:122:29)
+    at Parser.parse (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:35:38)
+    at Socket.<anonymous> (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/index.js:11:42)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+2024-12-02 20:29:59 [undefined] error: uncaughtException: database "kwakori" does not exist
+error: database "kwakori" does not exist
+    at Parser.parseErrorMessage (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:283:98)
+    at Parser.handlePacket (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:122:29)
+    at Parser.parse (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:35:38)
+    at Socket.<anonymous> (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/index.js:11:42)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+2024-12-02 20:32:07 [undefined] error: uncaughtException: database "kwakori" does not exist
+error: database "kwakori" does not exist
+    at Parser.parseErrorMessage (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:283:98)
+    at Parser.handlePacket (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:122:29)
+    at Parser.parse (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/parser.js:35:38)
+    at Socket.<anonymous> (/Users/kwakori/projects/personal-project/apikeyper/back/node_modules/pg-protocol/dist/index.js:11:42)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)

@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 30
+    },
+    "auditLog": "/Users/kwakori/projects/personal-project/apikeyper/back/logs/.9762721e11e27a424c2782c9f590b41277e40eec-audit.json",
+    "files": [
+        {
+            "date": 1733129288135,
+            "name": "/Users/kwakori/projects/personal-project/apikeyper/back/logs/2024-12-02.exception.log",
+            "hash": "800320ed51ff046667d6085d0ca6b46a403265d588e50aca56ed267a7b6c4322"
+        }
+    ],
+    "hashType": "sha256"
+}
