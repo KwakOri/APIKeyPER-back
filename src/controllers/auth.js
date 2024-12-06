@@ -45,7 +45,7 @@ const logIn = async (req, res) => {
       },
       process.env.JWT_REFRESH_TOKEN_SECRET_KEY,
       {
-        expiresIn: "1d",
+        expiresIn: "30s",
       }
     );
 
@@ -58,7 +58,7 @@ const logIn = async (req, res) => {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
       })
-      .header({ Authorization: accessToken })
+      .setHeader("authorization", accessToken)
       .send(JSON.stringify({ accessToken }));
   } catch (err) {
     logger.error(err);
