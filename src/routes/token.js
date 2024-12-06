@@ -1,8 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const { saveTokenData, getAllTokenData } = require("../controllers/token");
+const {
+  saveTokenData,
+  getMyTokenDatas,
+  getTokenData,
+} = require("../controllers/token");
+const verifyJWT = require("../middleware/verifyJWT");
 
-router.route("/").get(getAllTokenData).post(saveTokenData);
+router.use(verifyJWT);
+
+router.route("/").get(getMyTokenDatas).post(saveTokenData);
+router.route("/:id").get(getTokenData);
 
 module.exports = router;

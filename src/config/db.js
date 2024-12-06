@@ -11,4 +11,6 @@ const client = new Client({
   database: process.env.PG_DB_DATABASE,
 });
 
+client.connect();
+
 module.exports = client;
