@@ -70,4 +70,46 @@ const logIn = async (req, res) => {
 
 const signUp = () => {};
 
-module.exports = { logIn, signUp };
+const logOut = async (req, res) => {
+  try {
+    const cookies = req.cookies;
+
+    if (!cookies?.refreshToken) return res.sendStatus(204);
+
+    const refreshToken = cookies.refreshToken;
+    const isRefreshTokenInDB = {
+      query: `SELECT * FROM users WHERE refresh_token = $1`,
+      values: [refreshToken],
+    };
+
+    const { rows } = await client.query(
+      isRefreshTokenInDB.query,
+      isRefreshTokenInDB.values
+    );
+
+    if (rows.length === 0) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+      });
+      return res.sendStatus(204);
+    }
+    console.log("user_id => ", rows[0].id);
+    const deleteRefreshTokenQuery = {
+      query: `UPDATE users SET refresh_token = null WHERE id = $1`,
+      values: [rows[0].id],
+    };
+
+    await client.query(
+      deleteRefreshTokenQuery.query,
+      deleteRefreshTokenQuery.values
+    );
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+    });
+    return res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+module.exports = { logIn, signUp, logOut };
