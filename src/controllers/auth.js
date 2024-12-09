@@ -2,6 +2,10 @@ const logger = require("../config/logger");
 
 const jwt = require("jsonwebtoken");
 const client = require("../config/db");
+const {
+  REFRESH_TOKEN_EXPIRY_TIME,
+  ACCESS_TOKEN_EXPIRY_TIME,
+} = require("./constants");
 
 const logIn = async (req, res) => {
   const { email, password } = req.body;
@@ -35,7 +39,7 @@ const logIn = async (req, res) => {
       },
       process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
       {
-        expiresIn: "15s",
+        expiresIn: ACCESS_TOKEN_EXPIRY_TIME,
       }
     );
 
@@ -45,7 +49,7 @@ const logIn = async (req, res) => {
       },
       process.env.JWT_REFRESH_TOKEN_SECRET_KEY,
       {
-        expiresIn: "30s",
+        expiresIn: REFRESH_TOKEN_EXPIRY_TIME,
       }
     );
 
@@ -53,12 +57,18 @@ const logIn = async (req, res) => {
     const values = [refreshToken, userId];
     await client.query(query, values);
 
+    console.log("accessToken => ", accessToken);
+    console.log("refreshToken => ", refreshToken);
+
+    res.setHeader("authorization", `Bearer ${accessToken}`);
+    res.setHeader("Cache-Control", "no-store");
+
+    console.log(res);
     return res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
       })
-      .setHeader("authorization", accessToken)
       .send(JSON.stringify({ accessToken }));
   } catch (err) {
     logger.error(err);

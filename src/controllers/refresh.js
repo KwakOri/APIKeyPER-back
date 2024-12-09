@@ -1,5 +1,6 @@
 const client = require("../config/db");
 const jwt = require("jsonwebtoken");
+const { ACCESS_TOKEN_EXPIRY_TIME } = require("./constants");
 require("dotenv").config();
 
 const handleRefreshToken = async (req, res) => {
@@ -30,10 +31,12 @@ const handleRefreshToken = async (req, res) => {
       const accessToken = jwt.sign(
         { user_id: foundUser.id },
         process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
-        { expiresIn: "30s" }
+        { expiresIn: ACCESS_TOKEN_EXPIRY_TIME }
       );
 
       console.log("new accessToken => ", accessToken);
+
+      res.setHeader("Authorization", `Bearer ${accessToken}`);
 
       return res.send(JSON.stringify({ accessToken }));
     }

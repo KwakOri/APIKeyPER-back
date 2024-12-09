@@ -31,6 +31,7 @@ const saveTokenData = async (req, res) => {
     tokenExpiryDate,
     notificationOption,
   } = req.body;
+  const { user_id } = req;
   try {
     const query = `INSERT INTO tokens(token_name, token_from, token_value, token_created_date, token_expiry_date, notification_option, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
     const values = [
@@ -73,4 +74,41 @@ const getTokenData = async (req, res) => {
   }
 };
 
-module.exports = { getMyTokenDatas, saveTokenData, getTokenData };
+const updateTokenData = async (req, res) => {
+  const tokenDataId = req.params.id;
+  const {
+    tokenName,
+    tokenFrom,
+    tokenValue,
+    tokenCreatedDate,
+    tokenExpiryDate,
+    notificationOption,
+  } = req.body;
+  try {
+    const query = `UPDATE tokens SET token_name = $1, token_from = $2, token_value = $3, token_created_date = $4, token_expiry_date = $5, notification_option = $6 WHERE id = $7`;
+    const values = [
+      tokenName,
+      tokenFrom,
+      tokenValue,
+      tokenCreatedDate,
+      tokenExpiryDate,
+      notificationOption,
+      tokenDataId,
+    ];
+
+    await client.query(query, values);
+
+    logger.info(":201:POST /token 토큰 데이터 수정 성공");
+    return res.send({ success: true });
+  } catch (err) {
+    logger.error("토큰 데이터 수정 실패", err);
+    return res.send(err);
+  }
+};
+
+module.exports = {
+  getMyTokenDatas,
+  saveTokenData,
+  getTokenData,
+  updateTokenData,
+};
