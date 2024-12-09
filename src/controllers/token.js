@@ -61,11 +61,12 @@ const getTokenData = async (req, res) => {
     const query = `SELECT * FROM tokens WHERE id = $1`;
     const values = [tokenDataId];
     const { rows } = await client.query(query, values);
-    console.log(rows);
 
     if (rows.length === 0) {
+      logger.info(":200:GET /token/:id 토큰 조회 성공, 데이터 없음");
       return res.send(JSON.stringify({ data: null }));
     } else {
+      logger.info(":200:GET /token/:id 토큰 조회 성공");
       return res.send(JSON.stringify({ data: rows[0] }));
     }
   } catch (err) {
@@ -98,10 +99,26 @@ const updateTokenData = async (req, res) => {
 
     await client.query(query, values);
 
-    logger.info(":201:POST /token 토큰 데이터 수정 성공");
+    logger.info(":201:PATCH /token/:id 토큰 데이터 수정 성공");
     return res.send({ success: true });
   } catch (err) {
     logger.error("토큰 데이터 수정 실패", err);
+    return res.send(err);
+  }
+};
+
+const deleteTokenData = async (req, res) => {
+  const tokenDataId = req.params.id;
+  try {
+    const query = `DELETE FROM tokens WHERE id = $1`;
+    const values = [tokenDataId];
+
+    await client.query(query, values);
+
+    logger.info(":204:DELETE /token/:id 토큰 데이터 삭제 성공");
+    return res.send({ success: true });
+  } catch (err) {
+    logger.error("토큰 데이터 삭제 실패", err);
     return res.send(err);
   }
 };
@@ -111,4 +128,5 @@ module.exports = {
   saveTokenData,
   getTokenData,
   updateTokenData,
+  deleteTokenData,
 };
