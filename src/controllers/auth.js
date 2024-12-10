@@ -1,6 +1,6 @@
 require("dotenv").config();
 const logger = require("../config/logger");
-const nodemailer = require("nodemailer"); // 모듈 import
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const client = require("../config/db");
@@ -9,43 +9,42 @@ const {
   ACCESS_TOKEN_EXPIRY_TIME,
   EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME,
 } = require("./constants");
-
-const transporter = nodemailer.createTransport({
-  service: "gmail", // gmail을 사용함
-  auth: {
-    user: process.env.GMAIL_EMAIL,
-    pass: process.env.GMAIL_PASSWORD,
-  },
-});
+const Mail = require("../service/MailService");
+const MailService = require("../service/MailService");
 
 const logIn = async (req, res) => {
-  const { email, password } = req.body;
-
-  const query = `SELECT * FROM users WHERE email = $1`;
-  const values = [email];
-  const { rows } = await client.query(query, values);
-
-  if (rows.length === 0)
-    return res.status(404).send(
-      JSON.stringify({
-        success: false,
-        message: "등록되지 않은 이메일입니다.",
-      })
-    );
-
-  const isPasswordCorrect = await bcrypt.compare(password, rows[0].password);
-
-  if (!isPasswordCorrect)
-    return res.status(404).send(
-      JSON.stringify({
-        success: false,
-        message: "비밀번호가 일치하지 않습니다.",
-      })
-    );
-
-  const { id: userId } = rows[0];
-
   try {
+    const { email, password } = req.body;
+
+    const findEmailQuery = {
+      query: `SELECT * FROM users WHERE email = $1`,
+      values: [email],
+    };
+    const { rows } = await client.query(
+      findEmailQuery.query,
+      findEmailQuery.values
+    );
+
+    if (rows.length === 0)
+      return res.status(404).send(
+        JSON.stringify({
+          success: false,
+          message: "등록되지 않은 이메일입니다.",
+        })
+      );
+
+    const isPasswordCorrect = await bcrypt.compare(password, rows[0].password);
+
+    if (!isPasswordCorrect)
+      return res.status(404).send(
+        JSON.stringify({
+          success: false,
+          message: "비밀번호가 일치하지 않습니다.",
+        })
+      );
+
+    const { id: userId } = rows[0];
+
     const accessToken = jwt.sign(
       {
         user_id: userId,
@@ -113,46 +112,7 @@ const signUp = async (req, res) => {
       createNewUserDataQuery.values
     );
 
-    const verificationToken = jwt.sign(
-      {
-        email,
-      },
-      process.env.JWT_EMAIL_VERIFICATION_TOKEN_SECRET_KEY,
-      {
-        expiresIn: EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME,
-      }
-    );
-
-    const mailOptions = {
-      from: process.env.GMAIL_EMAIL, // 작성자
-      to: email, // 수신자
-      subject: "APIKeyPER Sign Up Verification Code", // 메일 제목
-      html: `<p>Please click the following link to verify your email address:</p>
-      <p> <a href="${process.env.SERVER_DOMAIN}/api/auth/sign-up/verification/email/${verificationToken}">Verify email</a> </p>`,
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        transporter.close();
-        logger.error(error);
-        res.status(500).send(
-          JSON.stringify({
-            success: false,
-            message: "인증메일 발송에 실패했습니다",
-          })
-        );
-      } else {
-        transporter.close();
-        logger.info("Verification Email sent: " + info.response);
-        res.status(201).send(
-          JSON.stringify({
-            success: true,
-            message:
-              "회원가입에 성공했습니다. 메일함에서 인증메일을 확인해주세요.",
-          })
-        );
-      }
-    });
+    MailService.sendVerificationMail(email);
   } catch (err) {
     console.error(err);
   }
