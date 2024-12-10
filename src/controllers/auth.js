@@ -4,14 +4,14 @@ const nodemailer = require("nodemailer"); // 모듈 import
 const bcrypt = require("bcrypt");
 const transporter = nodemailer.createTransport({
   service: "gmail", // gmail을 사용함
-  // auth: {
-  //   user: process.env.GMAIL_EMAIL, // 나의 (작성자) 이메일 주소
-  //   pass: process.env.GMAIL_PASSWORD, // 이메일의 비밀번호
-  // },
   auth: {
-    user: "apikeyper@gmail.com",
-    pass: "jwxc rmvr qele fibt",
+    user: process.env.GMAIL_EMAIL, // 나의 (작성자) 이메일 주소
+    pass: process.env.GMAIL_PASSWORD, // 이메일의 비밀번호
   },
+  // auth: {
+  //   user: "apikeyper@gmail.com",
+  //   pass: "jwxc rmvr qele fibt",
+  // },
 });
 
 const jwt = require("jsonwebtoken");
