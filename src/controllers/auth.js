@@ -1,4 +1,18 @@
+require("dotenv").config();
 const logger = require("../config/logger");
+const nodemailer = require("nodemailer"); // 모듈 import
+const bcrypt = require("bcrypt");
+const transporter = nodemailer.createTransport({
+  service: "gmail", // gmail을 사용함
+  // auth: {
+  //   user: process.env.GMAIL_EMAIL, // 나의 (작성자) 이메일 주소
+  //   pass: process.env.GMAIL_PASSWORD, // 이메일의 비밀번호
+  // },
+  auth: {
+    user: "apikeyper@gmail.com",
+    pass: "jwxc rmvr qele fibt",
+  },
+});
 
 const jwt = require("jsonwebtoken");
 const client = require("../config/db");
@@ -78,7 +92,23 @@ const logIn = async (req, res) => {
   // res.send(JSON.stringify({ data: null }));
 };
 
-const signUp = () => {};
+const signUp = async (req, res) => {
+  const { email, password } = req.body;
+
+  // TODO:
+  // 1. password bcrypt 모듈로 암호화 해야함.
+  // 2. 비대칭키로 프론트에서 백엔드 넘어오는 password 암호화.
+
+  const createNewUserDataQuery = {
+    query: `INSERT INTO users(email, password) VALUES ($1, $2)`,
+    values: [email, password],
+  };
+
+  await client.query(
+    createNewUserDataQuery.query,
+    createNewUserDataQuery.values
+  );
+};
 
 const logOut = async (req, res) => {
   try {
@@ -122,4 +152,48 @@ const logOut = async (req, res) => {
   }
 };
 
-module.exports = { logIn, signUp, logOut };
+const verifyEmail = async (req, res) => {
+  const { email } = req.body;
+
+  const isExistingUserQuery = {
+    query: `SELECT * FROM users WHERE email = $1`,
+    values: [email],
+  };
+  const { rows: existingUser } = await client.query(
+    isExistingUserQuery.query,
+    isExistingUserQuery.values
+  );
+  const isExist = existingUser.length > 0;
+  if (isExist)
+    return res.status(400).send(
+      JSON.stringify({
+        success: false,
+        message: "이미 등록된 이메일입니다.",
+      })
+    );
+  console.log("is working");
+
+  const mailOptions = {
+    from: process.env.GMAIL_EMAIL, // 작성자
+    to: email, // 수신자
+    subject: "APIKeyPER Sign Up Verification Code", // 메일 제목
+    text: "111111", // 메일 내용
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      logger.error(error);
+      res
+        .status(500)
+        .send({ success: false, message: "인증메일 발송에 실패했습니다" });
+    } else {
+      logger.info("Verification Email sent: " + info.response);
+      res.status(201).send({
+        success: true,
+        message: "인증메일이 성공적으로 발송되었습니다",
+      });
+    }
+  });
+};
+
+module.exports = { logIn, signUp, logOut, verifyEmail };
