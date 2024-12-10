@@ -2,20 +2,21 @@ require("dotenv").config();
 const logger = require("../config/logger");
 const nodemailer = require("nodemailer"); // 모듈 import
 const bcrypt = require("bcrypt");
-const transporter = nodemailer.createTransport({
-  service: "gmail", // gmail을 사용함
-  auth: {
-    user: process.env.GMAIL_EMAIL, // 나의 (작성자) 이메일 주소
-    pass: process.env.GMAIL_PASSWORD, // 이메일의 비밀번호
-  },
-});
-
 const jwt = require("jsonwebtoken");
 const client = require("../config/db");
 const {
   REFRESH_TOKEN_EXPIRY_TIME,
   ACCESS_TOKEN_EXPIRY_TIME,
+  EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME,
 } = require("./constants");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail", // gmail을 사용함
+  auth: {
+    user: process.env.GMAIL_EMAIL,
+    pass: process.env.GMAIL_PASSWORD,
+  },
+});
 
 const logIn = async (req, res) => {
   const { email, password } = req.body;
@@ -67,13 +68,9 @@ const logIn = async (req, res) => {
     const values = [refreshToken, userId];
     await client.query(query, values);
 
-    console.log("accessToken => ", accessToken);
-    console.log("refreshToken => ", refreshToken);
-
     res.setHeader("authorization", `Bearer ${accessToken}`);
     res.setHeader("Cache-Control", "no-store");
 
-    console.log(res);
     return res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -89,21 +86,70 @@ const logIn = async (req, res) => {
 };
 
 const signUp = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { username, email, password } = req.body;
 
-  // TODO:
-  // 1. password bcrypt 모듈로 암호화 해야함.
-  // 2. 비대칭키로 프론트에서 백엔드 넘어오는 password 암호화.
+    // bcrypt로 비밀번호 암호화 하기
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
 
-  const createNewUserDataQuery = {
-    query: `INSERT INTO users(email, password) VALUES ($1, $2)`,
-    values: [email, password],
-  };
+    // TODO:
+    // 1. password bcrypt 모듈로 암호화 해야함.
+    // 2. 비대칭키로 프론트에서 백엔드 넘어오는 password 암호화.
 
-  await client.query(
-    createNewUserDataQuery.query,
-    createNewUserDataQuery.values
-  );
+    const createNewUserDataQuery = {
+      query: `INSERT INTO users(username, email, password) VALUES ($1, $2, $3)`,
+      values: [username, email, hashedPassword],
+    };
+
+    await client.query(
+      createNewUserDataQuery.query,
+      createNewUserDataQuery.values
+    );
+
+    const verificationToken = jwt.sign(
+      {
+        email,
+      },
+      process.env.JWT_EMAIL_VERIFICATION_TOKEN_SECRET_KEY,
+      {
+        expiresIn: EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME,
+      }
+    );
+
+    const mailOptions = {
+      from: process.env.GMAIL_EMAIL, // 작성자
+      to: email, // 수신자
+      subject: "APIKeyPER Sign Up Verification Code", // 메일 제목
+      html: `<p>Please click the following link to verify your email address:</p>
+      <p> <a href="${process.env.SERVER_DOMAIN}/api/auth/sign-up/verification/email/${verificationToken}">Verify email</a> </p>`,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        transporter.close();
+        logger.error(error);
+        res.status(500).send(
+          JSON.stringify({
+            success: false,
+            message: "인증메일 발송에 실패했습니다",
+          })
+        );
+      } else {
+        transporter.close();
+        logger.info("Verification Email sent: " + info.response);
+        res.status(201).send(
+          JSON.stringify({
+            success: true,
+            message:
+              "회원가입에 성공했습니다. 메일함에서 인증메일을 확인해주세요.",
+          })
+        );
+      }
+    });
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const logOut = async (req, res) => {
@@ -129,7 +175,7 @@ const logOut = async (req, res) => {
       });
       return res.sendStatus(204);
     }
-    console.log("user_id => ", rows[0].id);
+
     const deleteRefreshTokenQuery = {
       query: `UPDATE users SET refresh_token = null WHERE id = $1`,
       values: [rows[0].id],
@@ -148,7 +194,7 @@ const logOut = async (req, res) => {
   }
 };
 
-const verifyEmail = async (req, res) => {
+const validateEmail = async (req, res) => {
   const { email } = req.body;
 
   const isExistingUserQuery = {
@@ -167,29 +213,52 @@ const verifyEmail = async (req, res) => {
         message: "이미 등록된 이메일입니다.",
       })
     );
-  console.log("is working");
-
-  const mailOptions = {
-    from: process.env.GMAIL_EMAIL, // 작성자
-    to: email, // 수신자
-    subject: "APIKeyPER Sign Up Verification Code", // 메일 제목
-    text: "111111", // 메일 내용
-  };
-
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      logger.error(error);
-      res
-        .status(500)
-        .send({ success: false, message: "인증메일 발송에 실패했습니다" });
-    } else {
-      logger.info("Verification Email sent: " + info.response);
-      res.status(201).send({
-        success: true,
-        message: "인증메일이 성공적으로 발송되었습니다",
-      });
-    }
-  });
+  return res.status(200).send(
+    JSON.stringify({
+      success: true,
+      message: "사용 가능한 이메일입니다.",
+    })
+  );
 };
 
-module.exports = { logIn, signUp, logOut, verifyEmail };
+const verifyEmailVerificationToken = async (req, res) => {
+  console.log(req.params);
+  if (!req.params?.token)
+    return res.status(400).send(
+      JSON.stringify({
+        success: false,
+        message: "인증토큰이 존재하지 않습니다.",
+      })
+    );
+  const verificationToken = req.params.token;
+
+  jwt.verify(
+    verificationToken,
+    process.env.JWT_EMAIL_VERIFICATION_TOKEN_SECRET_KEY,
+    async (err, decoded) => {
+      if (err || !decoded?.email) return res.sendStatus(401);
+
+      const userEmail = decoded.email;
+      const query = `UPDATE users SET is_verified = 'true' WHERE email = $1 `;
+      const values = [userEmail];
+      try {
+        await client.query(query, values);
+        logger.info(`${userEmail}, 이메일 인증 성공`);
+        return res.redirect(`${process.env.DOMAIN}`);
+      } catch (err) {
+        logger.error(err);
+        return res.send(
+          JSON.stringify({ success: true, message: "인증에 성공했습니다" })
+        );
+      }
+    }
+  );
+};
+
+module.exports = {
+  logIn,
+  signUp,
+  logOut,
+  validateEmail,
+  verifyEmailVerificationToken,
+};

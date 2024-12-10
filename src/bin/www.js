@@ -6,5 +6,5 @@ const logger = require("../config/logger");
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  logger.info("Server is listening...");
+  logger.info(`SERVER IS LISTENING, PORT:${PORT}`);
 });
