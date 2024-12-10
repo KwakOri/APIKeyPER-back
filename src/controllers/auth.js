@@ -33,7 +33,9 @@ const logIn = async (req, res) => {
       })
     );
 
-  if (password !== rows[0].password)
+  const isPasswordCorrect = await bcrypt.compare(password, rows[0].password);
+
+  if (!isPasswordCorrect)
     return res.status(404).send(
       JSON.stringify({
         success: false,
@@ -80,9 +82,13 @@ const logIn = async (req, res) => {
   } catch (err) {
     logger.error(err);
     console.error(err);
+    res.status(500).send(
+      JSON.stringify({
+        success: false,
+        message: "알 수 없는 에러가 발생했습니다.",
+      })
+    );
   }
-
-  // res.send(JSON.stringify({ data: null }));
 };
 
 const signUp = async (req, res) => {
@@ -195,64 +201,85 @@ const logOut = async (req, res) => {
 };
 
 const validateEmail = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  const isExistingUserQuery = {
-    query: `SELECT * FROM users WHERE email = $1`,
-    values: [email],
-  };
-  const { rows: existingUser } = await client.query(
-    isExistingUserQuery.query,
-    isExistingUserQuery.values
-  );
-  const isExist = existingUser.length > 0;
-  if (isExist)
-    return res.status(400).send(
+    const isExistingUserQuery = {
+      query: `SELECT * FROM users WHERE email = $1`,
+      values: [email],
+    };
+    const { rows: existingUser } = await client.query(
+      isExistingUserQuery.query,
+      isExistingUserQuery.values
+    );
+    const isExist = existingUser.length > 0;
+    if (isExist)
+      return res.status(400).send(
+        JSON.stringify({
+          success: false,
+          message: "이미 등록된 이메일입니다.",
+        })
+      );
+    return res.status(200).send(
       JSON.stringify({
-        success: false,
-        message: "이미 등록된 이메일입니다.",
+        success: true,
+        message: "사용 가능한 이메일입니다.",
       })
     );
-  return res.status(200).send(
-    JSON.stringify({
-      success: true,
-      message: "사용 가능한 이메일입니다.",
-    })
-  );
+  } catch (err) {
+    logger.error(err);
+    console.error(err);
+    res.status(500).send(
+      JSON.stringify({
+        success: false,
+        message: "알 수 없는 에러가 발생했습니다.",
+      })
+    );
+  }
 };
 
 const verifyEmailVerificationToken = async (req, res) => {
-  console.log(req.params);
-  if (!req.params?.token)
-    return res.status(400).send(
+  try {
+    if (!req.params?.token)
+      return res.status(400).send(
+        JSON.stringify({
+          success: false,
+          message: "인증토큰이 존재하지 않습니다.",
+        })
+      );
+    const verificationToken = req.params.token;
+
+    jwt.verify(
+      verificationToken,
+      process.env.JWT_EMAIL_VERIFICATION_TOKEN_SECRET_KEY,
+      async (err, decoded) => {
+        if (err || !decoded?.email) return res.sendStatus(401);
+
+        const userEmail = decoded.email;
+        const query = `UPDATE users SET is_verified = 'true' WHERE email = $1 `;
+        const values = [userEmail];
+        try {
+          await client.query(query, values);
+          logger.info(`${userEmail}, 이메일 인증 성공`);
+          return res.redirect(`${process.env.DOMAIN}`);
+        } catch (err) {
+          logger.error(err);
+          return res.send(
+            JSON.stringify({ success: true, message: "인증에 성공했습니다" })
+          );
+        }
+      }
+    );
+  } catch (err) {
+    logger.error(err);
+    console.error(err);
+    res.status(500).send(
       JSON.stringify({
         success: false,
-        message: "인증토큰이 존재하지 않습니다.",
+        message: "알 수 없는 에러가 발생했습니다.",
       })
     );
-  const verificationToken = req.params.token;
-
-  jwt.verify(
-    verificationToken,
-    process.env.JWT_EMAIL_VERIFICATION_TOKEN_SECRET_KEY,
-    async (err, decoded) => {
-      if (err || !decoded?.email) return res.sendStatus(401);
-
-      const userEmail = decoded.email;
-      const query = `UPDATE users SET is_verified = 'true' WHERE email = $1 `;
-      const values = [userEmail];
-      try {
-        await client.query(query, values);
-        logger.info(`${userEmail}, 이메일 인증 성공`);
-        return res.redirect(`${process.env.DOMAIN}`);
-      } catch (err) {
-        logger.error(err);
-        return res.send(
-          JSON.stringify({ success: true, message: "인증에 성공했습니다" })
-        );
-      }
-    }
-  );
+  }
 };
 
 module.exports = {

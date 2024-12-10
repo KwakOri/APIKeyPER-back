@@ -17,8 +17,4 @@ router
   .route("/sign-up/verification/email/:token")
   .get(verifyEmailVerificationToken);
 
-// TODO:
-// auth/sign-up/validation/email
-// auth/sign-up/validation/code
-
 module.exports = router;
