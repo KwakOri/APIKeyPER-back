@@ -1,0 +1,43 @@
+components:
+  $ref: "./components.yaml"
+
+# Paths section
+paths:
+  # Auth endpoints
+  /api/auth/sign-up:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: apikeyper
+                email:
+                  type: string
+                  example: apikeyper@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User created successfully
+        "400":
+          description: Bad request
