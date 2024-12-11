@@ -367,3 +367,123 @@ paths:
                 type: array
                 items:
                   $ref: ".#/components/schemas/Response-Token"
+  /api/token/{id}:
+    get:
+      tags:
+        - Token
+      summary: Get token data by id
+      parameters:
+        - name: id
+          in: path
+          description: token data id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: get token data by id
+          content:
+            application/json:
+              schema:
+                $ref: ".#/components/schemas/Response-Token"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
+    put:
+      tags:
+        - Token
+      summary: Update token data by id
+      parameters:
+        - name: id
+          in: path
+          description: token data id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ".#/components/schemas/Request-Token"
+      responses:
+        "200":
+          description: Token data updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token data updated successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
+    delete:
+      tags:
+        - Token
+      summary: Delete token data by id
+      parameters:
+        - name: id
+          in: path
+          description: token data id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token data deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token data deleted successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
