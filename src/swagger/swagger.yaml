@@ -41,3 +41,58 @@ paths:
                     example: User created successfully
         "400":
           description: Bad request
+  /api/auth/sign-up/validation/email:
+    post:
+      tags:
+        - Auth
+      summary: Validate email for user registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: apikeyper@example.com
+      responses:
+        "200":
+          description: Email is valid and available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Email is valid and available
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Email already exists
