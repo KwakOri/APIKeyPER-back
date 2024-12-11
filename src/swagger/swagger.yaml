@@ -96,3 +96,56 @@ paths:
                   message:
                     type: string
                     example: Email already exists
+  /api/auth/sign-up/verification/email/{token}:
+    get:
+      tags:
+        - Auth
+      summary: Validate email for user registration
+      parameters:
+        - name: token
+          in: path
+          description: email verification token
+          required: true
+          schema:
+            type: string
+            example: 123456
+      response:
+        "302":
+          description: signed up successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: signed up successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Email already exists
