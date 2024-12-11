@@ -149,3 +149,57 @@ paths:
                   message:
                     type: string
                     example: Email already exists
+  /api/auth/log-in:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abcde; Path=/; HttpOnly; Secure; SameSite=None
+            Authorization:
+              schema:
+                type: string
+                example: Bearer abcde
+          description: User authenticated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User authenticated successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
