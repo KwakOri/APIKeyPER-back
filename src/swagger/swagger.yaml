@@ -280,3 +280,37 @@ paths:
                     example: Bad request
         "401":
           description: Unauthorized
+  /api/account:
+    delete:
+      tags:
+        - Account
+      summary: Delete a user account
+      responses:
+        "200":
+          description: User account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User account deleted successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
