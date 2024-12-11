@@ -314,3 +314,43 @@ paths:
                     example: Bad request
         "401":
           description: Unauthorized
+  /api/token:
+    post:
+      tags:
+        - Token
+      summary: Create a new token data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ".#/components/schemas/Request-Token"
+      responses:
+        "201":
+          description: Token data created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token data created successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
