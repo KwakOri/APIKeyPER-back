@@ -13,7 +13,7 @@ router.route("/").get(getMyTokenDatas).post(saveTokenData);
 router
   .route("/:id")
   .get(getTokenData)
-  .patch(updateTokenData)
+  .put(updateTokenData)
   .delete(deleteTokenData);
 
 module.exports = router;
