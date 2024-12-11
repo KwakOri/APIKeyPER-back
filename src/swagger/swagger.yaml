@@ -204,7 +204,7 @@ paths:
         "401":
           description: Unauthorized
   /api/auth/log-out:
-    post:
+    delete:
       tags:
         - Auth
       summary: Log out a user
@@ -222,6 +222,49 @@ paths:
                   message:
                     type: string
                     example: User logged out successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
+  /api/auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      responses:
+        "200":
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abcde; Path=/; HttpOnly; Secure; SameSite=None
+            Authorization:
+              schema:
+                type: string
+                example: Bearer abcde
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Access token refreshed successfully
         "400":
           description: Bad request
           content:
