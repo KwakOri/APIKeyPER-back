@@ -1,0 +1,71 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+    Request-Token:
+      type: object
+      properties:
+        tokenName:
+          type: string
+          example: AWS-RDS-Key
+        tokenFrom:
+          type: string
+          example: AWS
+        tokenValue:
+          type: string
+          example: 23fAf320falj13ffaw3f3fa
+        tokenCreatedDate:
+          type: string
+          example: 2024:10:12
+        tokenExpiryDate:
+          type: string
+          example: 2024:10:12
+        notificationOption:
+          type: string
+          example: 1 day before expiry
+    Response-Token:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        tokenName:
+          type: string
+          example: AWS-RDS-Key
+        tokenFrom:
+          type: string
+          example: AWS
+        tokenValue:
+          type: string
+          example: 23fAf320falj13ffaw3f3fa
+        tokenCreatedDate:
+          type: string
+          example: 2024:10:12
+        tokenExpiryDate:
+          type: string
+          example: 2024:10:12
+        notificationOption:
+          type: string
+          example: 1 day before expiry
+        createdAt:
+          type: string
+          example: 2024:10:12
