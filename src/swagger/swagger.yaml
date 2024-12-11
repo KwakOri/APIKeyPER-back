@@ -203,3 +203,37 @@ paths:
                     example: Bad request
         "401":
           description: Unauthorized
+  /api/auth/log-out:
+    post:
+      tags:
+        - Auth
+      summary: Log out a user
+      responses:
+        "200":
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User logged out successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Bad request
+        "401":
+          description: Unauthorized
