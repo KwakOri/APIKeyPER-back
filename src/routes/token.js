@@ -5,12 +5,15 @@ const {
   saveTokenData,
   getMyTokenDatas,
   getTokenData,
+  updateTokenData,
+  deleteTokenData,
 } = require("../controllers/token");
-const verifyJWT = require("../middleware/verifyJWT");
-
-router.use(verifyJWT);
 
 router.route("/").get(getMyTokenDatas).post(saveTokenData);
-router.route("/:id").get(getTokenData);
+router
+  .route("/:id")
+  .get(getTokenData)
+  .put(updateTokenData)
+  .delete(deleteTokenData);
 
 module.exports = router;
