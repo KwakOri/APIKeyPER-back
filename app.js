@@ -12,7 +12,11 @@ const { swaggerUi, specs } = require("./src/swagger/swagger");
 
 app.use(
   cors({
-    origin: "https://api-key-per-front-ng1ez5zt1-kwakoris-projects.vercel.app",
+    origin: [
+      "https://api-key-per-front-ng1ez5zt1-kwakoris-projects.vercel.app",
+      process.env.DOMAIN,
+      "http://localhost:3001",
+    ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Content-Type", "Authorization"],
