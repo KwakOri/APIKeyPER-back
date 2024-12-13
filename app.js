@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// nodeCron.schedule("* * * * *", async () => {
+// nodeCron.schedule("0 9 * * *", async () => {
 //   await sendScheduledNotification();
 //   logger.info("Scheduled notification sent successfully");
 // });

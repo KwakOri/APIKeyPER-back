@@ -97,12 +97,11 @@ const logIn = async (req, res) => {
 
 const signUp = async (req, res) => {
   try {
-    console.log("req.body => ", req.body);
     const { username, email, password } = req.body;
 
     // bcrypt로 비밀번호 암호화 하기
     const salt = bcrypt.genSaltSync(10);
-    console.log("password => ", password, " / ", "salt => ", salt);
+
     const hashedPassword = bcrypt.hashSync(password, salt);
 
     const createNewUserDataQuery = {
@@ -133,7 +132,7 @@ const signUp = async (req, res) => {
       <p> <a href="${process.env.SERVER_DOMAIN}/api/auth/sign-up/verification/email/${verificationToken}">Verify email</a> </p>`,
     };
 
-    transporter.sendMail(mailOptions, function (error, info) {
+    transporter.sendMail(mailOptions, function(error, info) {
       if (error) {
         transporter.close();
         logger.error(error);
@@ -219,6 +218,8 @@ const logOut = async (req, res) => {
 const validateEmail = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("req.body => ", req.body);
+    console.log("email => ", email);
 
     const isExistingUserQuery = {
       query: `SELECT * FROM users WHERE email = $1`,
@@ -228,9 +229,10 @@ const validateEmail = async (req, res) => {
       isExistingUserQuery.query,
       isExistingUserQuery.values
     );
+    console.log("existingUser", existingUser);
     const isExist = existingUser.length > 0;
     if (isExist)
-      return res.status(400).send(
+      return res.status(409).send(
         JSON.stringify({
           success: false,
           message: "이미 등록된 이메일입니다.",
@@ -277,12 +279,10 @@ const verifyEmailVerificationToken = async (req, res) => {
         try {
           await client.query(query, values);
           logger.info(`${userEmail}, 이메일 인증 성공`);
-          return res.redirect(`${process.env.DOMAIN}`);
+          return res.redirect(`${process.env.DOMAIN}/auth/sign-up/success`);
         } catch (err) {
           logger.error(err);
-          return res.send(
-            JSON.stringify({ success: true, message: "인증에 성공했습니다" })
-          );
+          return res.redirect(`${process.env.DOMAIN}/auth/sign-up/fail`);
         }
       }
     );
@@ -304,11 +304,10 @@ const handleRefreshToken = async (req, res) => {
   if (!cookies?.refreshToken) return res.status(401);
 
   const refreshToken = cookies.refreshToken;
+
   const query = `SELECT * FROM users WHERE refresh_token = $1`;
   const values = [refreshToken];
   const { rows } = await client.query(query, values);
-
-  console.log("rows => ", rows);
 
   if (rows.length === 0) return res.sendStatus(404);
 
@@ -322,14 +321,11 @@ const handleRefreshToken = async (req, res) => {
     (err, decoded) => {
       if (err || foundUser.id !== decoded.user_id) return res.sendStatus(401);
 
-      console.log(foundUser.id, decoded.user_id);
       const accessToken = jwt.sign(
         { user_id: foundUser.id },
         process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
         { expiresIn: ACCESS_TOKEN_EXPIRY_TIME }
       );
-
-      console.log("new accessToken => ", accessToken);
 
       res.setHeader("Authorization", `Bearer ${accessToken}`);
 

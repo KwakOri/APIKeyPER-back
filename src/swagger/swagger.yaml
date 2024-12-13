@@ -1,9 +1,6 @@
 components:
   $ref: "./components.yaml"
-
-# Paths section
 paths:
-  # Auth endpoints
   /api/auth/sign-up:
     post:
       tags:

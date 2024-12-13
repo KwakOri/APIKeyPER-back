@@ -1,20 +1,18 @@
 const client = require("../config/db");
 const logger = require("../config/logger");
+const Token = require("../models/Token");
 
-const getMyTokenDatas = async (req, res) => {
+const getAllTokenData = async (req, res) => {
   const { user_id } = req;
-  console.log(user_id);
-
   try {
     const query = `SELECT * FROM tokens WHERE user_id = $1`;
     const values = [user_id];
     const { rows } = await client.query(query, values);
-    console.log(rows);
 
     if (rows.length === 0) {
       return res.send(JSON.stringify({ data: null }));
     } else {
-      return res.send(JSON.stringify({ data: rows }));
+      return res.send(JSON.stringify({ data: Token.makeRowsToTokens(rows) }));
     }
   } catch (err) {
     logger.error("토큰 데이터 조회 실패", err);
@@ -25,7 +23,7 @@ const getMyTokenDatas = async (req, res) => {
 const saveTokenData = async (req, res) => {
   const {
     tokenName,
-    tokenFrom,
+    tokenDescription,
     tokenValue,
     tokenCreatedDate,
     tokenExpiryDate,
@@ -33,10 +31,10 @@ const saveTokenData = async (req, res) => {
   } = req.body;
   const { user_id } = req;
   try {
-    const query = `INSERT INTO tokens(token_name, token_from, token_value, token_created_date, token_expiry_date, notification_option, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+    const query = `INSERT INTO tokens(token_name, token_description, token_value, token_created_date, token_expiry_date, notification_option, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
     const values = [
       tokenName,
-      tokenFrom,
+      tokenDescription,
       tokenValue,
       tokenCreatedDate,
       tokenExpiryDate,
@@ -67,7 +65,11 @@ const getTokenData = async (req, res) => {
       return res.send(JSON.stringify({ data: null }));
     } else {
       logger.info(":200:GET /token/:id 토큰 조회 성공");
-      return res.send(JSON.stringify({ data: rows[0] }));
+      return res.send(
+        JSON.stringify({
+          data: Token.makeRowsToToken(rows),
+        })
+      );
     }
   } catch (err) {
     logger.error("토큰 데이터 조회 실패", err);
@@ -77,19 +79,20 @@ const getTokenData = async (req, res) => {
 
 const updateTokenData = async (req, res) => {
   const tokenDataId = req.params.id;
+
   const {
     tokenName,
-    tokenFrom,
+    tokenDescription,
     tokenValue,
     tokenCreatedDate,
     tokenExpiryDate,
     notificationOption,
   } = req.body;
   try {
-    const query = `UPDATE tokens SET token_name = $1, token_from = $2, token_value = $3, token_created_date = $4, token_expiry_date = $5, notification_option = $6 WHERE id = $7`;
+    const query = `UPDATE tokens SET token_name = $1, token_description = $2, token_value = $3, token_created_date = $4, token_expiry_date = $5, notification_option = $6 WHERE id = $7`;
     const values = [
       tokenName,
-      tokenFrom,
+      tokenDescription,
       tokenValue,
       tokenCreatedDate,
       tokenExpiryDate,
@@ -109,9 +112,14 @@ const updateTokenData = async (req, res) => {
 
 const deleteTokenData = async (req, res) => {
   const tokenDataId = req.params.id;
+  const { user_id } = req;
+
+  console.log("id => ", tokenDataId);
+  console.log("user_id => ", user_id);
+
   try {
-    const query = `DELETE FROM tokens WHERE id = $1`;
-    const values = [tokenDataId];
+    const query = `DELETE FROM tokens WHERE id = $1 AND user_id = $2`;
+    const values = [tokenDataId, user_id];
 
     await client.query(query, values);
 
@@ -124,7 +132,7 @@ const deleteTokenData = async (req, res) => {
 };
 
 module.exports = {
-  getMyTokenDatas,
+  getMyTokenDatas: getAllTokenData,
   saveTokenData,
   getTokenData,
   updateTokenData,
