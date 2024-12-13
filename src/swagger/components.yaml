@@ -27,7 +27,7 @@ components:
         tokenName:
           type: string
           example: AWS-RDS-Key
-        tokenFrom:
+        tokenDescription:
           type: string
           example: AWS
         tokenValue:
@@ -51,7 +51,7 @@ components:
         tokenName:
           type: string
           example: AWS-RDS-Key
-        tokenFrom:
+        tokenDescription:
           type: string
           example: AWS
         tokenValue:

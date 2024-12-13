@@ -10,7 +10,6 @@ const sendFirebaseNotification = async (req, res) => {
       title,
       body
     );
-    console.log("result => ", result);
 
     logger.info(":201: POST /api/firebase/send-notification message 전송 성공");
     res
