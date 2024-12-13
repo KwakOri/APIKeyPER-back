@@ -12,7 +12,7 @@ const { swaggerUi, specs } = require("./src/swagger/swagger");
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: process.env.DOMAIN,
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Content-Type", "Authorization"],
