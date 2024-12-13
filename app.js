@@ -30,7 +30,10 @@ app.use(
   })
 );
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.DOMAIN);
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://api-key-per-front-ng1ez5zt1-kwakoris-projects.vercel.app"
+  );
   next();
 });
 
