@@ -55,6 +55,8 @@ const saveTokenData = async (req, res) => {
 const getTokenData = async (req, res) => {
   const tokenDataId = req.params.id;
 
+  console.log(res);
+
   try {
     const query = `SELECT * FROM tokens WHERE id = $1`;
     const values = [tokenDataId];
