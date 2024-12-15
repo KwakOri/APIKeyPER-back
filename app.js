@@ -12,10 +12,7 @@ const { swaggerUi, specs } = require("./src/swagger/swagger");
 
 app.use(
   cors({
-    origin: [
-      "https://api-key-per-front-ng1ez5zt1-kwakoris-projects.vercel.app",
-      process.env.DOMAIN,
-    ],
+    origin: "*",
     credentials: true,
     allowedHeaders: [
       "Content-Type",
@@ -29,13 +26,6 @@ app.use(
     ],
   })
 );
-app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://api-key-per-front-ng1ez5zt1-kwakoris-projects.vercel.app"
-  );
-  next();
-});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -45,6 +35,10 @@ app.use(cookieParser());
 //   await sendScheduledNotification();
 //   logger.info("Scheduled notification sent successfully");
 // });
+
+app.get("/", (req, res) => {
+  res.send(JSON.stringify({ success: true, message: "server is working" }));
+});
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
